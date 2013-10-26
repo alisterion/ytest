@@ -57,7 +57,6 @@ class TestAPI extends SimpleModel {
         }
 
         $criteria->addCondition('language = ' . (int) $params['language']);
-
         return TQuestions::model()->findAll($criteria);
     }
 
@@ -69,8 +68,9 @@ class TestAPI extends SimpleModel {
         $questions = $this->getQuestionArray($param);
         $questCountInTema = count($questions);
 
-        if (empty($questions))
+        if (empty($questions)) {
             return false;
+        }
         $questCount = (int) $params['question_count'];
 
         $aQuestonRndNum = array();
@@ -86,8 +86,13 @@ class TestAPI extends SimpleModel {
         $i = 1;
         $j = 1;
         $questionForUser = array();
+        var_dump(count($questions), $params['theams']);
+        foreach ($questions as $value) {
+            //var_dump($value["theam_id"]);
+        }
 
         foreach ($questions as $value) {
+
             if (in_array($i, $aQuestonRndNum)) {
                 $userId = $params['user_id'];
 
@@ -115,12 +120,6 @@ class TestAPI extends SimpleModel {
             $tblAnsw->question_cost = $part['question_cost'];
 
             $tblAnsw->insert();
-
-
-
-
-
-            //sleep(1);
 
             if ($tblAnsw->question_num == 1) {
                 $this->setQuestionTime(array('user_id' => $params['user_id'], 'question_num' => 1, 'question_time' => $params['question_time']));
@@ -277,30 +276,21 @@ class TestAPI extends SimpleModel {
 
         $command = Yii::app()->db->createCommand();
 
-
-
         if (empty($tblModuleList)) {
-
             $command->insert('t_them_to_module', array(
                 'language' => $params['language'],
                 'theams_ids' => $params['theam_id'],
                 'modul_id' => $params['modul_id'],
             ));
         } else {
-
             $tlist = explode(',', $tblModuleList['theams_ids']);
-
             if (in_array($params['theam_id'], $tlist)) {
                 return false;
             }
-
             $command->update('t_them_to_module', array(
                 'theams_ids' => $tblModuleList['theams_ids'] . "," . $params['theam_id'],
                     ), "modul_id = " . $params['modul_id'] . " and language = " . $params['language']);
-
-
             $result = $command->execute();
-            sleep(1);
             return $result;
         }
     }
@@ -359,10 +349,13 @@ class TestAPI extends SimpleModel {
             }
         }
         $command = Yii::app()->db->createCommand();
-
-        $command->update('t_them_to_module', array(
-            'theams_ids' => implode(',', $newArray),
-                ), "modul_id = " . $params['modul_id'] . " and language = " . $params['language']);
+        if (!empty($newArray)) {
+            $command->update('t_them_to_module', array(
+                'theams_ids' => implode(',', $newArray),
+                    ), "modul_id = " . $params['modul_id'] . " and language = " . $params['language']);
+        } else {
+            $command->delete('t_them_to_module', array("modul_id" => $params['modul_id'], "language" => $params['language']));
+        }
         $command->execute();
         return true;
     }
