@@ -74,34 +74,55 @@ class TestAPI extends SimpleModel {
         }
         $questCount = (int) $params['question_count'];
         $aQuestonRndNum = array();
-        $teamQuestCount = round($questCount / count($params['theams']))+1;
+        $teamQuestCount = round($questCount / count($params['theams'])) + 1;
         shuffle($questions);
 
         $userId = $params['user_id'];
         $questionRnd = array();
         $questionRndId = array();
         $qNum = 1;
-        foreach ($params['theams'] as $theam_id) {
-            $qCount = 0;
-            foreach ($questions as $value) {
-                if ($value["theam_id"] == $theam_id && $qCount < $teamQuestCount) {
-                    $questionRnd[$theam_id][] = array("question_id" => $value["id"]);
-                    $questionRndId[] = array(
-                        "user_id" => "$userId",
-                        "theam_id" => $theam_id,
-                        "question_id" => $value["id"],
-                        'true_answer' => $value['true_answer'],
-                        'question_num' => "$qNum",
-                        'question_cost' => "1"
-                    );
-                    $qCount++;
-                    $qNum++;
-                }
-                if ($qCount >= $teamQuestCount) {
-                    break;
+        if (is_array($params['theams'])) {
+            foreach ($params['theams'] as $theam_id) {
+                $qCount = 0;
+                foreach ($questions as $value) {
+                    if ($value["theam_id"] == $theam_id && $qCount < $teamQuestCount) {
+                        $questionRnd[$theam_id][] = array("question_id" => $value["id"]);
+                        $questionRndId[] = array(
+                            "user_id" => "$userId",
+                            "theam_id" => $theam_id,
+                            "question_id" => $value["id"],
+                            'true_answer' => $value['true_answer'],
+                            'question_num' => "$qNum",
+                            'question_cost' => "1"
+                        );
+                        $qCount++;
+                        $qNum++;
+                    }
+                    if ($qCount >= $teamQuestCount) {
+                        break;
+                    }
                 }
             }
+        } else {
+            $theam_id = (int) $params['theams'];
+            if (empty($theam_id)) {
+                return false;
+            }
+            $qNum = 1;
+            foreach ($questions as $value) {
+                $questionRnd[$theam_id][] = array("question_id" => $value["id"]);
+                $questionRndId[] = array(
+                    "user_id" => "$userId",
+                    "theam_id" => $theam_id,
+                    "question_id" => $value["id"],
+                    'true_answer' => $value['true_answer'],
+                    'question_num' => "$qNum",
+                    'question_cost' => "1"
+                );
+                $qNum++;
+            }
         }
+
         if (count($questionRndId) > $questCount) {
             $questionRndId = array_slice($questionRndId, 0, $questCount);
         }
@@ -113,7 +134,7 @@ class TestAPI extends SimpleModel {
             $tblAnsw->question_num = $part['question_num'];
             $tblAnsw->true_answer = $part['true_answer'];
             $tblAnsw->question_cost = $part['question_cost'];
-            
+
             $tblAnsw->insert();
 
             if ($tblAnsw->question_num == 1) {
@@ -453,11 +474,34 @@ class TestAPI extends SimpleModel {
         $command->select('*')
                 ->from('t_user_answers usranswer')
                 ->join('t_questions q', 'q.id=usranswer.question_id')
-                ->where('usranswer.user_id=:id', array(':id' => $id));
+                ->join('t_thems tq', 'q.theam_id = tq.id')
+                ->where('usranswer.user_id=:id', array(':id' => $id))
+                ->order("q.theam_id")
+        ;
 
         $res = $command->queryAll();
-
-        return $res;
+        $result = array();
+        if(empty($res)){
+            return false;
+        }
+        $theams = array();
+        $answers = array();
+        $theam_id = $res[0]["theam_id"];
+        $theam_name = $res[0]["title"]; 
+        $theams[$theam_id] = $theam_name;
+        foreach ($res as $value) {
+            if ($theam_id != $value["theam_id"]) {
+                $theam_id = $value["theam_id"];
+                $theam_name = $value["title"];
+                $theams[$theam_id] = $theam_name;
+            }
+            $answers[$theam_id][]=$value;
+        }
+        $result = array(
+          "theams" =>  $theams,
+          "answers" => $answers,
+        );
+        return $result;
     }
 
     public function getTestTheam($lang) {
