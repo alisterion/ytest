@@ -1,0 +1,1 @@
+<div style="font-size: 16px; color: #C00;"> Тема № <?php echo $number; ?> <?php echo $nameTheama ?> успішно записані в Базу.</div>
