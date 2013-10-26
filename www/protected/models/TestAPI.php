@@ -57,6 +57,7 @@ class TestAPI extends SimpleModel {
         }
 
         $criteria->addCondition('language = ' . (int) $params['language']);
+
         return TQuestions::model()->findAll($criteria);
     }
 
@@ -65,60 +66,54 @@ class TestAPI extends SimpleModel {
             'language' => $params['language'],
             'theams' => $params['theams']
         );
+        $questCount = (int) $params['question_count'];
         $questions = $this->getQuestionArray($param);
         $questCountInTema = count($questions);
-
         if (empty($questions)) {
             return false;
         }
         $questCount = (int) $params['question_count'];
-
         $aQuestonRndNum = array();
-        for ($p = 0; $p < $questCount; $p++) {
-            $randInt = rand(1, $questCountInTema);
-            if (in_array($randInt, $aQuestonRndNum)) {
-                $questCount++;
-            } else {
-                array_push($aQuestonRndNum, $randInt);
-            };
-        }
-        $questCount = (int) $params['question_count'];
-        $i = 1;
-        $j = 1;
-        $questionForUser = array();
-        var_dump(count($questions), $params['theams']);
-        foreach ($questions as $value) {
-            //var_dump($value["theam_id"]);
-        }
+        $teamQuestCount = round($questCount / count($params['theams']))+1;
+        shuffle($questions);
 
-        foreach ($questions as $value) {
-
-            if (in_array($i, $aQuestonRndNum)) {
-                $userId = $params['user_id'];
-
-                $questionForUser[] = array(
-                    'user_id' => "$userId",
-                    'question_id' => $value['id'],
-                    'question_num' => "$j",
-                    'true_answer' => $value['true_answer'],
-                    'question_cost' => "1"
-                );
-                $j++;
+        $userId = $params['user_id'];
+        $questionRnd = array();
+        $questionRndId = array();
+        $qNum = 1;
+        foreach ($params['theams'] as $theam_id) {
+            $qCount = 0;
+            foreach ($questions as $value) {
+                if ($value["theam_id"] == $theam_id && $qCount < $teamQuestCount) {
+                    $questionRnd[$theam_id][] = array("question_id" => $value["id"]);
+                    $questionRndId[] = array(
+                        "user_id" => "$userId",
+                        "theam_id" => $theam_id,
+                        "question_id" => $value["id"],
+                        'true_answer' => $value['true_answer'],
+                        'question_num' => "$qNum",
+                        'question_cost' => "1"
+                    );
+                    $qCount++;
+                    $qNum++;
+                }
+                if ($qCount >= $teamQuestCount) {
+                    break;
+                }
             }
-            $i++;
-        };
-        // var_dump($questionForUser);
-        foreach ($questionForUser as $part) {
-
+        }
+        if (count($questionRndId) > $questCount) {
+            $questionRndId = array_slice($questionRndId, 0, $questCount);
+        }
+        foreach ($questionRndId as $part) {
             $tblAnsw = new TUserAnswers;
-
 
             $tblAnsw->user_id = $part['user_id'];
             $tblAnsw->question_id = $part['question_id'];
             $tblAnsw->question_num = $part['question_num'];
             $tblAnsw->true_answer = $part['true_answer'];
             $tblAnsw->question_cost = $part['question_cost'];
-
+            
             $tblAnsw->insert();
 
             if ($tblAnsw->question_num == 1) {
@@ -139,8 +134,9 @@ class TestAPI extends SimpleModel {
     public function generateTest(array $params = array()) {
         $testType = $this->getTestType();
 
-        if (empty($testType))
+        if (empty($testType)) {
             return false;
+        }
         $moduleTheamsArray = array();
         $params['test_type'] = $testType['test_type'];
 

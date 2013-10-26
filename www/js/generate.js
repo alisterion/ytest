@@ -22,9 +22,7 @@ $(document).ready(function(){
                 console.log(data);
                 fHideErrors();
                 if(data.status){
-                    console.log(data); 
-                    
-                   // location.href = "/test";
+                    location.href = "/test";
                 }else{
                     fShowErrors(data.errors);
                 }
