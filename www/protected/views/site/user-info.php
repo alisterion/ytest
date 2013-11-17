@@ -1,17 +1,24 @@
 <script>
     $(function() {
-        $("#accordion").accordion({collapsible: true, active: false });
+        $("#accordion").accordion({collapsible: true, active: false});
     });
 </script>
 <div id="test-wrapper">
+    <div class="flash-notice">Student info: <b><?php echo $list["user"]["last_name"]; ?> <?php echo $list["user"]["name"]; ?></b>[<?php echo $list["user"]["group"]; ?>]</div>
     <div id="accordion">
         <?php foreach ($list["theams"] as $key => $theam) { ?> 
-            <h3><?php echo $theam; ?></h3>
+
+            <h3><?php echo $theam; ?>
+                <div class="all_count">
+                    <?php echo $list["answers_count"][$key]["true_count"]; ?>/<?php echo $list["answers_count"][$key]["count"]; ?>
+                </div>
+            </h3>
             <div>
                 <?php foreach ($list["answers"] as $theam) { ?>  
+                    <?php $i = 1; ?>
                     <?php foreach ($theam as $value) { ?>
                         <?php if ($value["theam_id"] == $key) { ?>
-                            <div class="flash-notice"><b><?php echo $value['question_num']; ?></b>. <?php echo $value['question_text']; ?> <?php if ($value['user_ansver_num'] == $value['true_answer']) { ?> <img src="/images/1352630656_clean.png" style="float: right;" /> <?php } ?></div>
+                            <div class="flash-notice"><?php echo $i; ?> <?php echo $value['question_text']; ?> <?php if ($value['user_ansver_num'] == $value['true_answer']) { ?> <img src="/images/1352630656_clean.png" style="float: right;" /> <?php } ?></div>
                             <div id="answers">
                                 <div rel="" <?php if ($value['true_answer'] == 1) { ?> class="flash-success"  <?php
                                 } else {
@@ -41,7 +48,9 @@
 
                             </div>
                         <?php } ?>
+                        <?php $i++; ?>
                     <?php } ?>
+
                 <?php } ?>
             </div>
         <?php } ?>

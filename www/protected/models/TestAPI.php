@@ -82,19 +82,12 @@ class TestAPI extends SimpleModel {
         $questionRndId = array();
         $qNum = 1;
         if (is_array($params['theams'])) {
+            $final_question = array();
             foreach ($params['theams'] as $theam_id) {
                 $qCount = 0;
                 foreach ($questions as $value) {
                     if ($value["theam_id"] == $theam_id && $qCount < $teamQuestCount) {
-                        $questionRnd[$theam_id][] = array("question_id" => $value["id"]);
-                        $questionRndId[] = array(
-                            "user_id" => "$userId",
-                            "theam_id" => $theam_id,
-                            "question_id" => $value["id"],
-                            'true_answer' => $value['true_answer'],
-                            'question_num' => "$qNum",
-                            'question_cost' => "1"
-                        );
+                        $final_question[] = $value;
                         $qCount++;
                         $qNum++;
                     }
@@ -102,6 +95,20 @@ class TestAPI extends SimpleModel {
                         break;
                     }
                 }
+            }
+            shuffle($final_question);
+            $qNum = 1;
+            foreach ($final_question as $value) {
+                $questionRnd[$theam_id][] = array("question_id" => $value["id"]);
+                $questionRndId[] = array(
+                    "user_id" => "$userId",
+                    "theam_id" => $theam_id,
+                    "question_id" => $value["id"],
+                    'true_answer' => $value['true_answer'],
+                    'question_num' => "$qNum",
+                    'question_cost' => "1"
+                );
+                $qNum++;
             }
         } else {
             $theam_id = (int) $params['theams'];
@@ -467,7 +474,6 @@ class TestAPI extends SimpleModel {
     }
 
     public function getUsersInfo($id) {
-
         $command = Yii::app()->db->createCommand();
 
 
@@ -481,13 +487,14 @@ class TestAPI extends SimpleModel {
 
         $res = $command->queryAll();
         $result = array();
-        if(empty($res)){
+        if (empty($res)) {
             return false;
         }
         $theams = array();
         $answers = array();
         $theam_id = $res[0]["theam_id"];
-        $theam_name = $res[0]["title"]; 
+        $theam_name = $res[0]["title"];
+
         $theams[$theam_id] = $theam_name;
         foreach ($res as $value) {
             if ($theam_id != $value["theam_id"]) {
@@ -495,11 +502,27 @@ class TestAPI extends SimpleModel {
                 $theam_name = $value["title"];
                 $theams[$theam_id] = $theam_name;
             }
-            $answers[$theam_id][]=$value;
+            $answers[$theam_id][] = $value;
+        }
+        $answers_count = array();
+        foreach ($answers as $key => $value) {
+            $true_count = 0;
+            $count = 0;
+            foreach ($value as $question) {
+                if ($question["user_ansver_num"] === $question["true_answer"]) {
+                    $true_count++;
+                }
+            }
+            $answers_count[$key] = array(
+                "count" => count($value),
+                "true_count" => $true_count
+            );
         }
         $result = array(
-          "theams" =>  $theams,
-          "answers" => $answers,
+            "theams" => $theams,
+            "answers" => $answers,
+            "answers_count" => $answers_count,
+            "user" => TUsers::model()->find("id=:id", array(':id' => $id))
         );
         return $result;
     }
