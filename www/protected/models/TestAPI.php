@@ -6,6 +6,11 @@ class TestAPI extends SimpleModel {
         return parent::model($className);
     }
 
+    public function isTestTimeNotEnd($user_id) {
+        $user = TUsers::model()->find('id = ' . $user_id);
+        return $user["end_test_at"] < time();
+    }
+
     public function getTestType() {
         $tblTTtype = TTestType::model();
         $criteria = new CDbCriteria();
@@ -13,6 +18,20 @@ class TestAPI extends SimpleModel {
         $criteria->limit = 1;
 
         return TTestType::model()->find($criteria);
+    }
+
+    public function getUserTimeAll($params = array()) {
+        return TUsers::model()->find('id = ' . $params['user_id']);
+    }
+
+    public function getUserQuestList($id) {
+        $list = TUserAnswers::model()->findAll("user_id = " . $id);
+
+        $q_list = array();
+        foreach ($list as $value) {
+            $q_list[$value["question_num"]] = $value["is_answered"];
+        }
+        return $q_list;
     }
 
     public function createUser($params = array()) {
@@ -23,6 +42,9 @@ class TestAPI extends SimpleModel {
         $tblUser->last_name = $params['last_name'];
         $tblUser->group = $params['group'];
         $tblUser->begin_test = date("Y-m-d");
+
+        $tblUser->start_test_at = time();
+        $tblUser->end_test_at = $tblUser->start_test_at + ((int) $params['time'] * 60);
         $tblUser->max_points = $params['quest_count'];
         if ($params['test_type'] == 1) {
             $tblUser->module_number = $params['type_num'];
@@ -167,6 +189,7 @@ class TestAPI extends SimpleModel {
         }
         $moduleTheamsArray = array();
         $params['test_type'] = $testType['test_type'];
+        $params['time'] = $testType['time'];
 
         $params['quest_count'] = $testType['quest_count'];
 
@@ -227,12 +250,14 @@ class TestAPI extends SimpleModel {
             'question' => $result['question_text'],
             'answers' => $answers,
             'rnd' => $rnd,
+            'answer_num' => $result["user_ansver_num"]
         );
     }
 
     public function userAnswer(array $params = array()) {
         $userAnswer = TUserAnswers::model()->find('user_id = ' . $params['user_id'] . ' and question_num =' . $params['question_num']);
         $userAnswer->user_ansver_num = $params['user_ansver_num'];
+        $userAnswer->is_answered = 1;
         return $userAnswer->update();
     }
 

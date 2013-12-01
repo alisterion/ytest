@@ -37,7 +37,7 @@ class SiteController extends Controller {
         $this->languageArray[0][7] = "оцінка";
         $this->languageArray[0][8] = "Підсумок";
         $this->languageArray[0][9] = "ВАША СТАТИСТИКА.";
-        
+
 
 
 
@@ -63,7 +63,6 @@ class SiteController extends Controller {
         $this->languageArray[2][7] = "rating";
         $this->languageArray[2][8] = "Result";
         $this->languageArray[2][9] = "YOUR STATISTIC.";
-        
     }
 
     private function _renderIndex() {
@@ -72,12 +71,12 @@ class SiteController extends Controller {
 
         $session = new CHttpSession;
         $session->open();
-        
+
         $API = TestAPI::model();
         $testType = $API->getTestTheam($session["language"]);
 
 
-        $this->render('index', array("languages" => $this->languageArray, "testType"=>$testType));
+        $this->render('index', array("languages" => $this->languageArray, "testType" => $testType));
     }
 
     /**
@@ -87,7 +86,7 @@ class SiteController extends Controller {
     public function actionIndex() {
         $session = new CHttpSession;
         $session->open();
-        
+
         if ($session['test_process']) {
             $this->redirect('/test');
         }
@@ -105,20 +104,20 @@ class SiteController extends Controller {
         $session = new CHttpSession;
         $session->open();
         $session["language"] = $lang;
-        
+
         $API = TestAPI::model();
         $testType = $API->getTestTheam($session["language"]);
-        
+
         $result = array(
             "status" => true,
             "content" => "",
             "title" => ""
         );
-        if(!empty($testType)){
-        $result["title"] = $testType;
-        }else{
-          $result['status'] = false;
-          $result["title"] = "Для даної мови немає теми, або модуль не наповнений.";
+        if (!empty($testType)) {
+            $result["title"] = $testType;
+        } else {
+            $result['status'] = false;
+            $result["title"] = "Для даної мови немає теми, або модуль не наповнений.";
         }
         $result["content"] = $this->renderPartial('input-data', array(
             "language" => $session["language"],
@@ -180,10 +179,14 @@ class SiteController extends Controller {
         $session = new CHttpSession;
         $session->open();
 
+        if ($API->isTestTimeNotEnd($session["user_id"])) {
+            $session['test_process'] = FALSE;
+        }
+
         if (!$session['test_process']) {
             $this->redirect('/');
         }
-
+        $testType = $API->getTestType();
         $params = array(
             'user_id' => $session['user_id'],
             'question_num' => $session['question_num'],
@@ -193,11 +196,11 @@ class SiteController extends Controller {
         // $API->setQuestionTime($params);
 
 
-
         $this->render('index', array(
             "testProcess" => $session['test_process'],
             "qResult" => $result,
-            'question_number' => $session['question_num']
+            'question_number' => $session['question_num'],
+            "max_question" => $testType["quest_count"]
         ));
     }
 
@@ -233,6 +236,41 @@ class SiteController extends Controller {
         Yii::app()->end();
     }
 
+    public function actionFinishTest() {
+        if (!Yii::app()->request->isAjaxRequest) {
+            Yii::app()->end();
+        }
+        $session = new CHttpSession;
+        $session->open();
+
+        $session['test_process'] = FALSE;
+    }
+
+    public function actionGetQuestion() {
+        if (!Yii::app()->request->isAjaxRequest) {
+            Yii::app()->end();
+        }
+        $API = TestAPI::model();
+        $session = new CHttpSession;
+        $session->open();
+        $quest_num = Yii::app()->request->getParam('quest_num', 0);
+        $params = array(
+            'user_id' => $session['user_id'],
+            'question_num' => $quest_num,
+        );
+
+        $result ['status'] = true;
+        $session['question_num'] = $quest_num;
+        $res = $API->getUserQuestion($params);
+
+        $result ['content'] = $this->renderPartial('test', array(
+            'qResult' => $res,
+            'question_number' => $quest_num
+                ), true);
+        echo json_encode($result);
+        Yii::app()->end();
+    }
+
     public function actionAnswer() {
         if (!Yii::app()->request->isAjaxRequest) {
             Yii::app()->end();
@@ -247,27 +285,38 @@ class SiteController extends Controller {
             'errors' => '',
         );
 
+        if ($API->isTestTimeNotEnd($session["user_id"])) {
+            $session['test_process'] = FALSE;
+        }
+
         $params = array(
             'user_id' => $session['user_id'],
-            'question_num' => $session['question_num'],
+            'question_num' => Yii::app()->request->getParam('quest_num', 0),
             'user_ansver_num' => Yii::app()->request->getParam('user_answer', 0),
         );
-
+        $session['question_num'] = Yii::app()->request->getParam('quest_num', 0);
         $result['status'] = $API->userAnswer($params);
         if ($result['status']) {
-            $session['question_num'] = $session['question_num'] + 1;
             $testType = $API->getTestType();
+            if ($session['question_num'] >= $testType['quest_count']) {
+                $session['question_num'] = 1;
+            } else {
+                $session['question_num'] = $session['question_num'] + 1;
+            }
+
+
+            
             $params = array(
                 'user_id' => $session['user_id'],
                 'question_num' => $session['question_num'],
                 'question_time' => $testType['time']
             );
-            if ($session["max_question"] < $session['question_num']) {
-                $result['status'] = 'finish';
-                $session['test_process'] = false;
-                echo json_encode($result);
-                Yii::app()->end();
-            }
+//            if ($session["max_question"] < $session['question_num']) {
+//                $result['status'] = 'finish';
+//                $session['test_process'] = false;
+//                echo json_encode($result);
+//                Yii::app()->end();
+//            }
             $res = $API->getUserQuestion($params);
             $result ['content'] = $this->renderPartial('test', array(
                 'qResult' => $res,
@@ -278,6 +327,31 @@ class SiteController extends Controller {
 
         echo json_encode($result);
         Yii::app()->end();
+    }
+
+    public function actiongetUserStats() {
+        if (!Yii::app()->request->isAjaxRequest) {
+            Yii::app()->end();
+        }
+
+        $API = TestAPI::model();
+        $session = new CHttpSession;
+        $session->open();
+
+
+        $params = array(
+            'user_id' => $session['user_id'],
+        );
+        $res = $API->getUserTimeAll($params);
+        $result["start_test_at"] = $res["start_test_at"];
+        $result["end_test_at"] = $res["end_test_at"];
+        $result["now"] = time();
+
+        if (!empty($result)) {
+            echo json_encode($result);
+        } else {
+            return FALSE;
+        }
     }
 
     public function actiongetUserInfo() {
@@ -403,36 +477,34 @@ class SiteController extends Controller {
         $session->open();
 
         $lang = $session['language'];
-        
+
 
         if (is_uploaded_file($_FILES["tfile"]["tmp_name"])) {
-            
-            
+
+
             $tfile = file($_FILES["tfile"]["tmp_name"]);
-            
-            $result = $API->parseArrayFromFile($tfile,$lang);
+
+            $result = $API->parseArrayFromFile($tfile, $lang);
             $result['language'] = $lang;
             $pattern1 = '/([0-9]+)/';
-            $arr1 =array();
-            if(preg_match($pattern1, $_FILES["tfile"]["name"],$arr1)){
-                $result['number'] = (int)$arr1[0];
+            $arr1 = array();
+            if (preg_match($pattern1, $_FILES["tfile"]["name"], $arr1)) {
+                $result['number'] = (int) $arr1[0];
             }
-           
+
             $addResult = $API->insertTemaInBd($result);
-            
-             $this->render("view-upload-data",array(
-                 'number'  => $result['number'] ,
-                 'nameTheama'  => $result['nameTheama'] ,
-             ));
+
+            $this->render("view-upload-data", array(
+                'number' => $result['number'],
+                'nameTheama' => $result['nameTheama'],
+            ));
             // Если файл загружен успешно, перемещаем его
             // из временной директории в конечную
             //move_uploaded_file($_FILES["filename"]["tmp_name"], "/path/to/file/" . $_FILES["filename"]["name"]);
         } else {
             echo("Ошибка загрузки файла");
-             $this->render("upload-view");
+            $this->render("upload-view");
         }
-
-       
     }
 
     public function actionCreateModule() {
@@ -545,86 +617,94 @@ class SiteController extends Controller {
         echo json_encode($result);
         Yii::app()->end();
     }
-    
-    
-    public function actionStatistic(){
-        
+
+    public function actionStatistic() {
+
         $request = Yii::app()->request;
         $session = new CHttpSession;
         $session->open();
-        
+
         if ($session['test_process']) {
             $this->redirect('/test');
         }
         $API = TestAPI::model();
-        
-        $date = Yii::app()->request->getParam('date',date("Y-m-d"));
-                
-        
+
+        $date = Yii::app()->request->getParam('date', date("Y-m-d"));
+
+
         $params = array(
             'date' => $date
         );
-        
+
         $result = $API->getUsers($params);
-        if(Yii::app()->request->isAjaxRequest){
-            $this->renderPartial("stat_load",array(
+        if (Yii::app()->request->isAjaxRequest) {
+            $this->renderPartial("stat_load", array(
                 'users' => $result,
                 'date' => $date
             ));
-        }else{
+        } else {
             Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/stat.js');
-            $this->render("stat",array(
+            $this->render("stat", array(
                 'users' => $result,
                 'date' => $date
             ));
         }
     }
-    
-    
-    
-    public function actionUserInfo(){
-        $id = Yii::app()->request->getParam('id',0);
+
+    public function actionUserInfo() {
+        $id = Yii::app()->request->getParam('id', 0);
         $API = TestAPI::model();
         $result = $API->getUsersInfo($id);
-        
-         $this->render("user-info",array(
-                'list' =>$result,
-            ));
-        
+
+        $this->render("user-info", array(
+            'list' => $result,
+        ));
     }
-    
-    
-    public function actionDeleteTheam(){
-         if (CHttpRequest::getUserHostAddress() != "127.0.0.1") {
+
+    public function actionDeleteTheam() {
+        if (CHttpRequest::getUserHostAddress() != "127.0.0.1") {
             Yii::app()->end();
         }
-        $id = Yii::app()->request->getParam('id',0);
+        $id = Yii::app()->request->getParam('id', 0);
         $API = TestAPI::model();
         $session = new CHttpSession;
         $session->open();
-        
-        if($id <= 0){
-             Yii::app()->end();
+
+        if ($id <= 0) {
+            Yii::app()->end();
         }
         $params = array(
             'vis_id' => $id,
-            'language'=>  $session['language']
+            'language' => $session['language']
         );
         $result = $API->deleteTheamFromBd($params);
-         Yii::app()->end();
-        
+        Yii::app()->end();
     }
-    public function actionDeleteModul(){
-         if (CHttpRequest::getUserHostAddress() != "127.0.0.1") {
+
+    public function actionDeleteModul() {
+        if (CHttpRequest::getUserHostAddress() != "127.0.0.1") {
             Yii::app()->end();
         }
-        $id = Yii::app()->request->getParam('id',0);
+        $id = Yii::app()->request->getParam('id', 0);
         $API = TestAPI::model();
-        if($id <= 0){
-             Yii::app()->end();
+        if ($id <= 0) {
+            Yii::app()->end();
         }
         $result = $API->deleteModulFromBd($id);
-         Yii::app()->end();
+        Yii::app()->end();
+    }
+
+    public function actiongetQuestList() {
+        if (!Yii::app()->request->isAjaxRequest) {
+            Yii::app()->end();
+        }
+        $API = TestAPI::model();
+        $session = new CHttpSession;
+        $session->open();
+
+        $list = $API->getUserQuestList($session["user_id"]);
+        echo json_encode($list);
+        Yii::app()->end();
     }
 
 }

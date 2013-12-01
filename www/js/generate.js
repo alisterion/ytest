@@ -19,7 +19,6 @@ $(document).ready(function(){
             },
             success:function(data){
                 $("#overley").hide();
-                console.log(data);
                 fHideErrors();
                 if(data.status){
                     location.href = "/test";

@@ -209,6 +209,10 @@ div.flash-success
     background-position: 10px 10px;
 }
 
+.flash-success.q_list{
+    background: none;
+}
+
 div.flash-error a
 {
     color:#8a1f11;
@@ -768,4 +772,21 @@ h3 .all_count{
 
 .ui-accordion .ui-accordion-header {
     padding-right: 2.2em!important;
+}
+
+#question_list{
+    min-height: 40px;
+    height: auto;
+}
+#question_list .quest_list{
+    float: left;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    margin-right: 25px;
+    font-size: 16px;
+    padding-left: 2.0em;
+}
+#question_list .quest_list.active{
+    background-color: #FBC2C4;
 }

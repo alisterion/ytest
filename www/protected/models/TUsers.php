@@ -16,6 +16,8 @@
  * @property integer $them_num
  * @property integer $language
  * @property integer $max_points
+ * @property integer $start_test_at
+ * @property integer $end_test_at
  */
 class TUsers extends CActiveRecord
 {
@@ -44,11 +46,11 @@ class TUsers extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('user_usnic_num, last_name, name, group, points, begin_test, end_test, module_number, them_num, max_points', 'required'),
-			array('user_usnic_num, points, module_number, them_num', 'numerical', 'integerOnly'=>true),
+			array('user_usnic_num, last_name, name, group, points, begin_test, end_test, module_number, them_num, max_points, start_test_at, end_test_at', 'required'),
+			array('user_usnic_num, points, module_number, them_num, start_test_at, end_test_at', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, user_usnic_num, last_name, name, group, points, begin_test, end_test, module_number, them_num', 'safe', 'on'=>'search'),
+			array('id, user_usnic_num, last_name, name, group, points, begin_test, end_test, module_number, them_num, start_test_at, end_test_at', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -81,7 +83,9 @@ class TUsers extends CActiveRecord
 			'module_number' => 'Module Number',
 			'them_num' => 'Them Num',
                         'language' => 'language',
-                        'max_points'=>'max_points'
+                        'max_points'=>'max_points',
+                        'start_test_at'=>'start_test_at',
+                        'end_test_at'=>'end_test_at'
 		);
 	}
 
@@ -119,6 +123,10 @@ class TUsers extends CActiveRecord
 		$criteria->compare('language',$this->language);
                 
 		$criteria->compare('max_points',$this->max_points);
+                
+		$criteria->compare('start_test_at',$this->start_test_at);
+                
+		$criteria->compare('end_test_at',$this->end_test_at);
 
 		return new CActiveDataProvider('TUsers', array(
 			'criteria'=>$criteria,
