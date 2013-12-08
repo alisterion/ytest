@@ -22,7 +22,7 @@
     <div style="text-align: center;">
         <input id="max_question" value="<?php echo $max_question; ?>" type="hidden"/>
         <a id="get_prew" data-question="<?php echo $question_number - 1; ?>"  href="#"><img src="/images/back.png"/></a>
-        <a id="send_answer" data-question="<?php echo $question_number; ?>"  href="#"><img src="/images/accept.png"/></a>
+        <a id="send_answer" data-question="<?php echo $question_number; ?>" style="display: none;"  href="#"></a>
         <a id="get_next" href="#"><img src="/images/next.png"/></a>
         <a id="finish_test" style="margin-left: 75px;" href="#"><img src="/images/finish_flag.png"/></a>
     </div>

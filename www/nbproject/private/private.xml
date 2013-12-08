@@ -3,15 +3,19 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/generate.js</file>
             <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/css/main.css</file>
-            <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/test.js</file>
+            <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/models/TUserAnswers.php</file>
             <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/controllers/SiteController.php</file>
             <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/user-info.php</file>
+            <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/models/TTestType.php</file>
             <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/models/TestAPI.php</file>
             <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/models/TUsers.php</file>
+            <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/stat.php</file>
             <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/test.php</file>
             <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/README</file>
+            <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/test.js</file>
+            <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/index.php</file>
+            <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/user_stat.php</file>
         </group>
     </open-files>
 </project-private>

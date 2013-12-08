@@ -13,6 +13,9 @@ $(document).ready(function() {
         //$('#send_answer').show();
     });
 
+
+
+
     function set_active_quest(num) {
         $("#question_list .quest_list.active").removeClass("active");
         var now_quest = $("#question_list .quest_list")[num - 1];
@@ -48,11 +51,12 @@ $(document).ready(function() {
                     return false;
                 }
                 if (data.status) {
-                    $("#main-content").html(data.content);
+                    //$("#main-content").html(data.content);
                     var now_quest = $("#question_list .quest_list")[q_num - 1];
                     set_active_quest(q_num + 1);
                     $(now_quest).removeClass("flash-notice")
                     $(now_quest).addClass("flash-success")
+                    check_for_end()
                 }
 
             }
@@ -267,6 +271,13 @@ $(document).ready(function() {
     $("#get_next").die().live("click", function(event) {
         event.preventDefault()
         var now = $("#send_answer").data("question");
+        var max = parseInt(max_question, 10);
+        if (answerNum > 0) {
+            sendAnswer(now);
+
+            get_first_not_answer(now, max)
+            return false;
+        }
         if (parseInt(max_question, 10) <= now) {
             getQuestion(1);
         } else {
@@ -305,7 +316,33 @@ $(document).ready(function() {
         }
     })
 
+    function check_for_end() {
+        if ($("#question_list div.flash-notice").length <= 0) {
+            finishTest();
+        }
+    }
 
+
+    function check_for_not_answer() {
+        return $("#question_list div.flash-notice");
+    }
+
+
+    function get_first_not_answer(now, max) {
+        not_answer_array = check_for_not_answer();
+        if (max <= now) {
+            getQuestion(parseInt($(not_answer_array[0]).data("num"), 10));
+        }
+        if (now + 1 < max) {
+            var res = $("#question_list div").slice(now, max);
+            $(res).each(function() {
+                if ($(this).hasClass("flash-notice")) {
+                    getQuestion(parseInt($(this).data("num"), 10))
+                    return false;
+                }
+            })
+        }
+    }
 
     function user_time() {
         $.ajax({
