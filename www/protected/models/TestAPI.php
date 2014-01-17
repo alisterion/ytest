@@ -425,6 +425,8 @@ class TestAPI extends SimpleModel {
 
         $allQuestArray = array();
         $nameTheama = '';
+        $imgArray = array();
+        $qNum = 0;
         for ($i = 0; $i < $count; $i++) {
 
             $pattern1 = '/(name\:)/';
@@ -443,11 +445,18 @@ class TestAPI extends SimpleModel {
                 $questArray['answer_5'] = $tfile[$i + 5];
                 $questArray['true'] = (int) trim(str_replace("trueNum:", "", $tfile[$i + 6]));
                 $allQuestArray[] = $questArray;
+                $qNum++;
+            }
+            $pattern_img = '/(Img\:)/';
+            $arr_2 = array();
+            if (preg_match_all($pattern_img, $tfile[$i], $arr_2)) {
+                $imgArray[$qNum] = trim(str_replace("Img:", "", $tfile[$i]));
             }
         }
         return array(
             'allQuestArray' => $allQuestArray,
-            'nameTheama' => $nameTheama
+            'nameTheama' => $nameTheama,
+            "upload_img" => $imgArray
         );
     }
 

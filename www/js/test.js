@@ -44,7 +44,7 @@ $(document).ready(function() {
             },
             success: function(data) {
 
-                $("#overley").hide();
+                
                 if (data.status == "finish") {
                     //clearInterval(intervalID);
                     showUserStat();
@@ -58,6 +58,7 @@ $(document).ready(function() {
                     $(now_quest).addClass("flash-success")
                     check_for_end()
                 }
+                $("#overley").hide();
 
             }
         })
@@ -189,7 +190,7 @@ $(document).ready(function() {
             },
             success: function(data) {
 
-                $("#overley").hide();
+                
                 if (data.status == "finish") {
                     //clearInterval(intervalID);
                     showUserStat();
@@ -199,6 +200,7 @@ $(document).ready(function() {
                     $("#main-content").html(data.content);
                     set_active_quest($("#send_answer").data("question"));
                 }
+                $("#overley").hide();
 
             }
         })
@@ -333,7 +335,7 @@ $(document).ready(function() {
         if (max <= now) {
             getQuestion(parseInt($(not_answer_array[0]).data("num"), 10));
         }
-        if (now + 1 < max) {
+        if (now + 1 <= max) {
             var res = $("#question_list div").slice(now, max);
             $(res).each(function() {
                 if ($(this).hasClass("flash-notice")) {

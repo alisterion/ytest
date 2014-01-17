@@ -305,7 +305,7 @@ class SiteController extends Controller {
             }
 
 
-            
+
             $params = array(
                 'user_id' => $session['user_id'],
                 'question_num' => $session['question_num'],
@@ -470,6 +470,35 @@ class SiteController extends Controller {
         ));
     }
 
+    public function actionGetImagePoint() {
+        header("Content-type: image/png");
+        $API = TestAPI::model();
+        $session = new CHttpSession;
+        $session->open();
+        $user_id = $session['user_id'];
+        $user_info = $API->getUsersInfo($user_id);
+        $true_result = 0;
+        $all_result = 0;
+        foreach ($user_info["answers_count"] as $value) {
+            $true_result+=(int) $value["true_count"];
+            $all_result+=(int) $value["count"];
+        }
+        $img = imagecreate(60, 20);
+        $background_color = imagecolorallocate($img, 249, 249, 249);
+        $text_color = imagecolorallocate($img, 233, 14, 91);
+        $text_color_2 = imagecolorallocate($img, 213, 114, 191);
+        $str = "$true_result";
+        imagestring($img, 34, 20, 5, $str, $text_color);
+        imagestring($img, 34, 30, 5, "($all_result)", $text_color_2);
+        imagepng($img);
+        imagedestroy($img);
+    }
+
+    public function actionLoadImages() {
+        require('/uploader/UploadHandler.php');
+        $upload_handler = new UploadHandler();
+    }
+
     public function actionLoadFromFile() {
 
         $API = TestAPI::model();
@@ -491,18 +520,17 @@ class SiteController extends Controller {
             if (preg_match($pattern1, $_FILES["tfile"]["name"], $arr1)) {
                 $result['number'] = (int) $arr1[0];
             }
-
             $addResult = $API->insertTemaInBd($result);
 
             $this->render("view-upload-data", array(
                 'number' => $result['number'],
                 'nameTheama' => $result['nameTheama'],
+                "is_have_images" => !empty($result["upload_img"])
             ));
             // Если файл загружен успешно, перемещаем его
             // из временной директории в конечную
             //move_uploaded_file($_FILES["filename"]["tmp_name"], "/path/to/file/" . $_FILES["filename"]["name"]);
         } else {
-            echo("Ошибка загрузки файла");
             $this->render("upload-view");
         }
     }
