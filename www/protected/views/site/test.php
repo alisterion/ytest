@@ -1,5 +1,12 @@
 <div id="test-wrapper">
-    <div class="flash-notice"><?php echo $question_number . "." . $qResult['question']; ?></div>
+    <div class="flash-notice">
+        <?php echo $question_number . "." . $qResult['question']; ?>
+        <?php if (!empty($qResult["img"])) { ?>
+            <div style="padding-top: 10px;">
+                <img style="max-height: 300px;" src="<?php echo Yii::app()->baseUrl . $qResult["img"]; ?>"/>
+            </div>
+        <?php } ?>
+    </div>
 
     <div id="answers">
 

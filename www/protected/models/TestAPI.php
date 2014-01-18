@@ -219,6 +219,7 @@ class TestAPI extends SimpleModel {
     public function getUserQuestion(array $params = array()) {
         $tblUser = TUsers::model()->tableName();
         $tblQuestion = TQuestions::model()->tableName();
+        $tblQImg = TQuestionImages::model();
         $tblUserAnswer = TUserAnswers::model()->tableName();
         $question = Yii::app()->db->createCommand()
                 ->select('*')
@@ -233,12 +234,12 @@ class TestAPI extends SimpleModel {
                 ->from(t_random_answers)
                 ->where('id=' . rand(1, 772));
         $rnd = $rndQ->queryRow();
-
-
-
-
-
-
+        $img = $tblQImg->find("question_id = " . $result["question_id"]);
+        $img_src = NULL;
+        if (!empty($img["img_src"])) {
+            $img_src = $img["img_src"];
+        }
+        
         $answers = array(
             '1' => $result['answ_1'],
             '2' => $result['answ_2'],
@@ -250,7 +251,8 @@ class TestAPI extends SimpleModel {
             'question' => $result['question_text'],
             'answers' => $answers,
             'rnd' => $rnd,
-            'answer_num' => $result["user_ansver_num"]
+            'answer_num' => $result["user_ansver_num"],
+            'img' => $img_src
         );
     }
 
@@ -451,6 +453,7 @@ class TestAPI extends SimpleModel {
             $arr_2 = array();
             if (preg_match_all($pattern_img, $tfile[$i], $arr_2)) {
                 $imgArray[$qNum] = trim(str_replace("Img:", "", $tfile[$i]));
+                $allQuestArray[$qNum - 1]["img"] = $imgArray[$qNum];
             }
         }
         return array(
@@ -460,18 +463,41 @@ class TestAPI extends SimpleModel {
         );
     }
 
+    private function insertImg($theam_id, array $img = array()) {
+
+        foreach ($img as $key => $value) {
+            $tblQImg = new TQuestionImages();
+            $tblQImg->question_id = $key;
+            $tblQImg->img_src = "/public/" . $value;
+            $tblQImg->theam_id = $theam_id;
+            $tblQImg->insert();
+        }
+    }
+
     public function insertTemaInBd(array $params = array()) {
         $tblexistTema = TThems::model()->find("theam_visible_num = " . $params['number'] . " and language = " . $params['language']);
+
         if (!empty($tblexistTema)) {
             $id = $tblexistTema['id'];
             $tblexistTema->delete();
             $tblQuestExist = TQuestions::model()->findAll('theam_id = ' . $id);
             if (!empty($tblQuestExist)) {
                 foreach ($tblQuestExist as $value) {
+                    $tblQimages = TQuestionImages::model()->findAll("question_id = " . $value->id);
+                    if (!empty($tblQimages)) {
+                        foreach ($tblQimages as $img) {
+                            $file_str = str_replace("\protected", "", Yii::app()->basePath) . $img->img_src;
+                            if (is_file($file_str)) {
+                                unlink($file_str);
+                            }
+                            $img->delete();
+                        }
+                    }
                     $value->delete();
                 }
             }
         }
+        $imgForQuestion = array();
         $tblTheams = new TThems;
         $tblTheams->title = $params['nameTheama'];
         $tblTheams->language = $params['language'];
@@ -494,6 +520,13 @@ class TestAPI extends SimpleModel {
             $tblQuestion->true_answer = $value['true'];
             $tblQuestion->language = $params['language'];
             $tblQuestion->insert();
+            if (!empty($value["img"])) {
+                $imgForQuestion[$tblQuestion->id] = $value["img"];
+            }
+        }
+
+        if (!empty($imgForQuestion)) {
+            $this->insertImg($tblTheams->id, $imgForQuestion);
         }
 
         return true;
@@ -515,6 +548,7 @@ class TestAPI extends SimpleModel {
                 ->from('t_user_answers usranswer')
                 ->join('t_questions q', 'q.id=usranswer.question_id')
                 ->join('t_thems tq', 'q.theam_id = tq.id')
+                ->join('t_question_imgs tqi', 'q.id = tqi.question_id')
                 ->where('usranswer.user_id=:id', array(':id' => $id))
                 ->order("q.theam_id")
         ;
@@ -582,12 +616,23 @@ class TestAPI extends SimpleModel {
 
     public function deleteTheamFromBd(array $params = array()) {
         $tblexistTema = TThems::model()->find('theam_visible_num = ' . $params['vis_id'] . ' and language = ' . $params['language']);
+
         if (!empty($tblexistTema)) {
             $id = $tblexistTema['id'];
             $tblexistTema->delete();
             $tblQuestExist = TQuestions::model()->findAll('theam_id = ' . $id);
             if (!empty($tblQuestExist)) {
                 foreach ($tblQuestExist as $value) {
+                    $value->delete();
+                }
+            }
+            $tblQImg = TQuestionImages::model()->findAll('theam_id = ' . $id);
+            if (!empty($tblQImg)) {
+                foreach ($tblQImg as $value) {
+                    $file_str = str_replace("\protected", "", Yii::app()->basePath) . $value->img_src;
+                    if (is_file($file_str)) {
+                        unlink($file_str);
+                    }
                     $value->delete();
                 }
             }

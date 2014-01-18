@@ -1,1 +1,4 @@
 /*[13:15:25][178 ms]*/ ALTER TABLE `avtest_2`.`t_users` ADD COLUMN `start_test_at` INT(11) NOT NULL AFTER `language`, ADD COLUMN `end_test_at` INT(11) NOT NULL AFTER `start_test_at`; 
+/*[12:09:48][113 ms]*/ CREATE TABLE `avtest_2`.`t_question_imgs`( `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT, `question_id` INT(11) UNSIGNED NOT NULL, `img_src` VARCHAR(255) NOT NULL, PRIMARY KEY (`id`) ); 
+/*[12:25:05][185 ms]*/ ALTER TABLE `avtest_2`.`t_question_imgs` ADD COLUMN `theam_id` INT(11) UNSIGNED NOT NULL AFTER `img_src`; 
+/*[12:26:37][118 ms]*/ ALTER TABLE `avtest_2`.`t_question_imgs` DROP INDEX `unic`, ADD UNIQUE INDEX `unic` (`question_id`, `theam_id`); 

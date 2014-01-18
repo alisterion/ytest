@@ -3,8 +3,31 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/test.js</file>
-            <file>file:/I:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/test.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/user-info.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/jquery-1.8.2.js</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/uploader/jquery.fileupload-ui.js</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/uploader/vendor/load-image.min.js</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/user_stat.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/css/jquery.css</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/uploader/jquery.fileupload.js</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/uploader/UploadHandler.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/uploader/vendor/bootstrap.min.js</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/login.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/uploader/jquery.fileupload-image.js</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/uploader/jquery.fileupload-jquery-ui.js</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/view-upload-data.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/models/TestAPI.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/css/jquery-ui.css</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/README</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/stat_load.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/stat.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/uploader/vendor/canvas-to-blob.min.js</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/css/bootstrap.min.css</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/test.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/index_1.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/js/uploader/main.js</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/controllers/SiteController.php</file>
+            <file>file:/L:/ServerYTest_v.2.2(r151112)/ServerYTest/home/ytest/www/protected/views/site/input-data.php</file>
         </group>
     </open-files>
 </project-private>

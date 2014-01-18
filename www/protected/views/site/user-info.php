@@ -18,7 +18,8 @@
                     <?php $i = 1; ?>
                     <?php foreach ($theam as $value) { ?>
                         <?php if ($value["theam_id"] == $key) { ?>
-                            <div class="flash-notice"><?php echo $i; ?> <?php echo $value['question_text']; ?> <?php if ($value['user_ansver_num'] == $value['true_answer']) { ?> <img src="/images/1352630656_clean.png" style="float: right;" /> <?php } ?></div>
+                            <div class="flash-notice"><?php echo $i; ?> <?php echo $value['question_text']; ?> 
+                                <div><img style="max-height: 300px; max-width: 900px; padding-top: 10px;" src="<?php echo $value["img_src"]; ?>"/> </div> <?php if ($value['user_ansver_num'] == $value['true_answer']) { ?> <img src="/images/1352630656_clean.png" style="float: right;" /> <?php } ?></div>
                             <div id="answers">
                                 <div rel="" <?php if ($value['true_answer'] == 1) { ?> class="flash-success"  <?php
                                 } else {
