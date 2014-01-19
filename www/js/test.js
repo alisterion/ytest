@@ -48,6 +48,7 @@ $(document).ready(function() {
                 if (data.status == "finish") {
                     //clearInterval(intervalID);
                     showUserStat();
+                    window.location.href = "/site/UserResult";
                     return false;
                 }
                 if (data.status) {

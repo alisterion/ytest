@@ -15,9 +15,7 @@
                 <div>
                     <div class="text">
                         <div style="font-size: 16px;" id="gvChartDiv1" class="gvChart" style="position: relative;">
-
-                            <span ><?php echo $user['name'] . " " . $user['last_name'] . " [" . $languages[$language][3] . ":" . $user['group'] . "]"; ?></span>
-                            <div style="width: 400px; text-align: center; padding-top: 20px;"><span><?php echo $languages[$language][6] . " " . $languages[$language][7] ?>:</span> <span style="color: #CC0000; font-weight: bold;"><img src="http://ytest/site/GetImagePoint"/></div>
+                            <div style="width: 400px; text-align: center; padding-left: 70px; padding-top: 20px;"><img id="img_result" src="/site/getjpg"/></div>
                             <div style="padding-top: 20px; background: url(/images/info.png) left center no-repeat; padding-left: 35px; padding-top: 20px;"><a href="/site/userinfo/<?php echo $user['id']; ?>"> <?php echo $languages[$language][9]; ?></a></div>
                         </div>
                     </div>
@@ -27,3 +25,13 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+
+        var interval = window.setInterval(updateImage, 5000);
+        function updateImage() {
+            $("#img_result").attr("src", "");
+            $("#img_result").attr("src", "/site/getjpg");
+        }
+    });
+</script>

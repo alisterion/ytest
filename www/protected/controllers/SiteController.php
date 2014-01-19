@@ -470,12 +470,18 @@ class SiteController extends Controller {
         ));
     }
 
-    public function actionGetImagePoint() {
-        header("Content-type: image/png");
+    public function actionUserResult() {
+        $this->render("user_result_img", array());
+    }
+
+    public function actionGetJpg() {
         $API = TestAPI::model();
         $session = new CHttpSession;
         $session->open();
+
         $user_id = $session['user_id'];
+        $lang = $session['language'];
+
         $user_info = $API->getUsersInfo($user_id);
         $true_result = 0;
         $all_result = 0;
@@ -483,13 +489,58 @@ class SiteController extends Controller {
             $true_result+=(int) $value["true_count"];
             $all_result+=(int) $value["count"];
         }
-        $img = imagecreate(60, 20);
+        //Создаём "чистый" холст для рисования шириной 200 пикселей и высотой 300 пикселей
+        $i = imageCreate(400, 200);
+        $font = "fonts/f2.ttf";
+        //Делаем белый фон
+        $color = imagecolorallocate($i, 249, 249, 249);
+        //Устанавливаем красный цвет
+        $color = imageColorAllocate($i, 0, 0, 0);
+        $color_2 = imageColorAllocate($i, 140, 140, 140);
+
+        //Переводим текст из кириллицы в Unicode
+        $name_text = $user_info["user"]["name"] . " " . $user_info["user"]["last_name"] . " " . $this->languageArray[$lang][3] . "[ " . $user_info["user"]["group"] . " ]";
+        $point_text = $this->languageArray[$lang][6]." ".$this->languageArray[$lang][7]." ".$true_result." [".$all_result."]";
+        //Рисуем текст ttf-шрифтом
+        imageTtfText($i, 16, 0, 50, 50, $color, $font, $name_text);
+        imageTtfText($i, 16, 0, 100, 150, $color_2, $font, $point_text);
+        //Отправляем заголовок с mime-type
+        Header("Content-type: image/jpeg");
+        //Выводим изображение
+        imageJpeg($i);
+        //Уничтожаем идентификатор и освобождаем ресурсы сервера
+        imageDestroy($i);
+    }
+
+    public function actionGetImagePoint() {
+        header("Content-type: image/png");
+        $API = TestAPI::model();
+        $session = new CHttpSession;
+        $session->open();
+
+        $user_id = $session['user_id'];
+        $lang = $session['language'];
+
+        $user_info = $API->getUsersInfo($user_id);
+        $true_result = 0;
+        $all_result = 0;
+        foreach ($user_info["answers_count"] as $value) {
+            $true_result+=(int) $value["true_count"];
+            $all_result+=(int) $value["count"];
+        }
+        $img = imagecreate(400, 300);
         $background_color = imagecolorallocate($img, 249, 249, 249);
         $text_color = imagecolorallocate($img, 233, 14, 91);
         $text_color_2 = imagecolorallocate($img, 213, 114, 191);
         $str = "$true_result";
-        imagestring($img, 34, 20, 5, $str, $text_color);
-        imagestring($img, 34, 30, 5, "($all_result)", $text_color_2);
+
+
+
+
+
+        imagestring($img, 34, 100, 100, $str, $text_color);
+        imagestring($img, 34, 130, 100, "($all_result)", $text_color_2);
+
         imagepng($img);
         imagedestroy($img);
     }
